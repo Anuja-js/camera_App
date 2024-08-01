@@ -7,15 +7,15 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key, this.imageSaves}) : super(key: key);
+  MyApp({Key? key,}) : super(key: key);
 
-  final Function? imageSaves;
+
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: {
-        "home": (ctx) => HomeScreen(imageSaves ?? (image) {}),
+        "home": (ctx) => HomeScreen(),
 
       },
       initialRoute: "home",

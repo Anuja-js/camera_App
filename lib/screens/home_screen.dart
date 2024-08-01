@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cameraapp/models/class_model.dart';
+import 'package:cameraapp/utils/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart' as syspath;
@@ -8,50 +10,20 @@ import '../custom_widgets/custom_appbar.dart';
 import 'gallery_images.dart';
 
 class HomeScreen extends StatefulWidget {
-  final Function imageSaves;
-  HomeScreen(this.imageSaves);
+
+  HomeScreen();
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  DatabaseHelper helper = DatabaseHelper();
   File? imageFile;
   File? saveImages;
 
-  void savedImage(File image) {
-    saveImages = image;
-  }
 
-  Future<void> _takePicture() async {
-    final picker = ImagePicker();
-    final picFile = await picker.pickImage(
-        source: ImageSource.camera, maxWidth: 600);
-    if (picFile == null) {
-      return;
-    }
-    setState(() {
-      imageFile = File(picFile.path);
-    });
-    final apDir = await syspath.getApplicationSupportDirectory();
-    final fileName = path.basename(picFile.path);
-    final saveImagePath = await imageFile!.copy("${apDir.path}/$fileName");
-    widget.imageSaves(saveImagePath);
-  }
 
-  void onSave() {
-    if (saveImages != null) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => GalleryImages(imagePath: saveImages!.path),
-        ),
-      );
-    } else {
-      // Handle the case where saveImages is null
-      // For example, show a message to the user
-      print("No image to save.");
-    }
-  }
 
 
   @override
@@ -73,16 +45,12 @@ class _HomeScreenState extends State<HomeScreen> {
           tittle: 'MY GALLERY',
           icon: IconButton(
             onPressed: () {
-              if (saveImages != null) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => GalleryImages(imagePath: saveImages!.path),
+                    builder: (context) => GalleryImages(),
                   ),
                 );
-              } else {
-                // Handle null case
-                print("No image to display.");
-              }
+
             },
             icon: Icon(Icons.image, color: black, size: 25),
           ),
@@ -109,8 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )
                   : Center(child: Text("Add Image")),
             ),
-            Center(
-              child: TextButton.icon(
+             Center(
+              child: imageFile != null?TextButton.icon(
                 onPressed: () {
                   onSave();
                 },
@@ -125,11 +93,43 @@ class _HomeScreenState extends State<HomeScreen> {
                   "Add Image to Gallery",
                   style: TextStyle(color:black),
                 ),
-              ),
-            ),
+              ):SizedBox()
+            )
           ],
         ),
       ),
     );
+  }
+  Future<void> _takePicture() async {
+    final picker = ImagePicker();
+    final picFile = await picker.pickImage(
+        source: ImageSource.camera, maxWidth: 600);
+    if (picFile == null) {
+      return;
+    }
+    setState(() {
+      saveImages = File(picFile.path);
+      imageFile = File(picFile.path);
+    });
+    //find app directory
+    final apDir = await syspath.getApplicationSupportDirectory();
+    final fileName = path.basename(picFile.path);
+    //save to application directory
+    final saveImagePath = await imageFile!.copy("${apDir.path}/$fileName");
+
+  }
+
+  void onSave() {
+    if (saveImages != null) {
+      Data data=Data(saveImages!.path);
+      helper.insertData(data);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => GalleryImages(),
+        ),
+      );
+    } else {
+      print("No image to save.");
+    }
   }
 }
