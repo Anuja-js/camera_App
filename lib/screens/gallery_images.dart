@@ -54,10 +54,12 @@ class _GalleryImagesState extends State<GalleryImages> {
               )),
         ),
         body: images.length == 0
-            ? const Text(
-                "No Images Found",
-                style: TextStyle(color: black),
-              )
+            ? Center(
+              child: const Text(
+                  "No Images Found",
+                  style: TextStyle(color: black),
+                ),
+            )
             : GridView.builder(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 10),

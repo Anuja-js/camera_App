@@ -69,12 +69,7 @@ class DatabaseHelper {
     return result;
   }
 
-  // Future<int> updateData(Data Data) async {
-  //   Database db = await database;
-  //   var result = await db.update(DataTable, Data.toMap(),
-  //       where: '$colId = ?', whereArgs: [Data.id]);
-  //   return result;
-  // }
+
 
   Future<int> deleteData(int id) async {
     Database db = await database;
